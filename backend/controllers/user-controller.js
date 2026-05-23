@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 
 const jwt = require("jsonwebtoken");
 
-const getUsers = async (req, res, next) => {
+const getAllUsers = async (req, res, next) => {
   let users;
   try {
     users = await User.find({}, "-password");
@@ -16,10 +16,11 @@ const getUsers = async (req, res, next) => {
   }
   res.json(users.map((user) => user.toObject({ getters: true })));
 };
-const getUser = async (req, res, next) => {
+const getUserById = async (req, res, next) => {
   let user;
+  const { userId } = req.body;
   try {
-    user = await User.find({ id: 41 }, "-password");
+    user = await User.findById({ id: userId }, "-password");
   } catch (e) {
     const error = new HttpError(e.message, 500);
     return next(error);
@@ -71,9 +72,73 @@ const signUp = async (req, res, next) => {
     return next(error);
   }
 };
-const signIn = async () => {};
+const signIn = async (req, res, next) => {
+  const { email, password } = req.body;
 
-exports.getUsers = getUsers;
-exports.getUser = getUser;
+  if (!email || !password) {
+    const error = new HttpError("All fields are required!", 400);
+    return next(error);
+  }
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (e) {
+    console.log("Couldn't search for user -- during LOGIN");
+    const error = new HttpError(`An Error has occured: ${e.message}}`, 500);
+    return next(error);
+  }
+
+  if (!existingUser) {
+    const error = new HttpError("Invalid Credentials.", 401);
+    return next(error);
+  }
+
+  let isValidPassword;
+
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (e) {
+    return next(
+      new HttpError(
+        "Could not sign in. Please try again. Dev: Invalid PW",
+        500,
+      ),
+    );
+  }
+
+  if (!isValidPassword) {
+    return next(new HttpError("Invalid Credentials", 401));
+  }
+
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: existingUser._id, role: existingUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+  } catch (e) {
+    return next(
+      new HttpError(
+        "Could not sign in, please try again -- Dev: Token Registation Failed",
+        500,
+      ),
+    );
+  }
+
+  res.json({
+    token,
+    user: {
+      id: existingUser._id,
+      name: existingUser.name,
+      email: existingUser.email,
+      role: existingUser.role,
+    },
+  });
+};
+
+exports.getUsers = getAllUsers;
+exports.getUser = getUserById;
 exports.signUp = signUp;
 exports.signIn = signIn;
