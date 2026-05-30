@@ -11,7 +11,7 @@ const getAllUsers = async (req, res, next) => {
   try {
     users = await User.find({}, "-password");
   } catch (e) {
-    const error = new HttpError("Couldnt Fetch Users!", 500);
+    const error = new HttpError("Couldn not Fetch Users!", 500);
     return next(error);
   }
   res.json(users.map((user) => user.toObject({ getters: true })));
@@ -61,9 +61,9 @@ const signUp = async (req, res, next) => {
     });
 
     if (role == "player") {
-      await Player.create({ user_id: newUser._id });
+      await Player.create({ _id: newUser._id });
     } else if (role == "judge") {
-      await Judge.create({ user_id: newUser._id });
+      await Judge.create({ _id: newUser._id });
     }
 
     res.status(201).json({ newUser });

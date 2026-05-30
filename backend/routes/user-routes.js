@@ -10,23 +10,23 @@ router.get("/", userController.getUsers);
 router.post("/signup", userController.signUp);
 router.post("/signin", userController.signIn);
 
-router.get(
-  "/",
-  authenticate,
-  authorizeRoles("admin"),
-  userController.getAllUsers,
-);
-router.get(
-  "/judges",
-  authenticate,
-  authorizeRoles("admin"),
-  userController.getJudges,
-);
-router.get(
-  "/players",
-  authenticate,
-  authorizeRoles("admin"),
-  userController.getPlayers,
-);
+// router.get(
+//   "/",
+//   authenticate,
+//   authorizeRoles("admin"),
+//   userController.getAllUsers,
+// );
+// router.get(
+//   "/judges",
+//   authenticate,
+//   authorizeRoles("admin"),
+//   userController.getJudges,
+// );
+// router.get(
+//   "/players",
+//   authenticate,
+//   authorizeRoles("admin"),
+//   userController.getPlayers,
+// );
 
 module.exports = router;
