@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 // const matchRoute = require("./routes/match-routes");
 const userRoute = require("./routes/user-routes");
 const tournamentRoute = require("./routes/tournament-routes");
+const playerRoute = require("./routes/player-routes");
 const HttpError = require("./models/http-error");
 
 const app = express();
@@ -32,7 +33,8 @@ app.use((req, res, next) => {
 
 // app.use("/api/matches", matchRoute);
 app.use("/api/users", userRoute);
-app.use("/api/tournament", tournamentRoute);
+app.use("/api/tournaments", tournamentRoute);
+app.use("/api/players", playerRoute);
 
 app.use((error, req, res, next) => {
   if (res.headersSent) {

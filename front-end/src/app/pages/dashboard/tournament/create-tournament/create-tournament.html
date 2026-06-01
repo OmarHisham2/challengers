@@ -1,0 +1,99 @@
+<form (ngSubmit)="onCreateTournament()" [formGroup]="tournamentForm" class="w-full">
+    <p-toast />
+    <div class="flex flex-col md:flex-row gap-6 items-stretch w-full">
+        <div class="card w-full md:w-2/3">
+            <div class="font-semibold text-xl mb-4">Create Tournament</div>
+            <div class="flex flex-col gap-6 w-full">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="tournamentName">Tournament Name</label>
+                        <input pInputText id="tournamentName" name="tournamentName" type="text" class="w-full" formControlName="tournamentName" [invalid]="isInvalid('tournamentName')" />
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="maxPlayers">Max PlayersDirectory</label>
+                        <input pInputText id="maxPlayers" name="maxPlayers" type="number" class="w-full" formControlName="maxPlayers"  [invalid]="isInvalid('maxPlayers')"/>
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="bestOf">Best Of</label>
+                        <p-selectbutton
+                            [options]="bestOfOptions"
+                            formControlName="bestOf"
+                            optionLabel="label"
+                            optionValue="value"
+                            class="w-full" />
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 w-full">
+                    <label for="address">Description (Optional)</label>
+                    <textarea pTextarea id="address" name="address" rows="4" class="w-full" formControlName="tournamentDescription"></textarea>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="state">Location</label>
+                        <p-select id="state" name="location" formControlName="location" [options]="dropdownItems" optionLabel="label" optionValue="value" placeholder="Select One" class="w-full" [invalid]="isInvalid('location')"></p-select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="registrationDeadline">Registration Deadline</label>
+                        <p-datepicker id="registrationDeadline" name="registrationDeadline" [showIcon]="true" [showButtonBar]="true" formControlName="registrationDeadline"></p-datepicker>
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="startDate">Start Date</label>
+                        <p-datepicker id="startDate" name="startDate" [showIcon]="true" [showButtonBar]="true" formControlName="startDate"></p-datepicker>
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="endDate">End Date</label>
+                        <p-datepicker id="endDate" name="endDate" [showIcon]="true" [showButtonBar]="true" formControlName="endDate"></p-datepicker>
+                    </div>
+
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-3">
+                    <p class="transition-opacity duration-200" [class.opacity-100]="!formValues().tournamentType" [class.opacity-50]="formValues().tournamentType">Round Robin</p>
+                    <p-toggleswitch name="tournamentType" formControlName="tournamentType" />
+                    <p class="transition-opacity duration-200" [class.opacity-100]="formValues().tournamentType" [class.opacity-50]="!formValues().tournamentType">Single Elimination</p>
+                </div>
+
+                @if (tournamentForm.errors?.['regAfterStart']) {
+                    <div class="w-full mt-2">
+                        <p-message severity="error" variant="simple" class="w-full">
+                            Registration deadline must be scheduled before the tournament start date.
+                        </p-message>
+                    </div>
+                }
+
+                @if (tournamentForm.errors?.['startAfterEnd']) {
+                    <div class="w-full mt-2">
+                        <p-message severity="error" variant="simple" class="w-full">
+                            The tournament start date must occur before its scheduled completion date.
+                        </p-message>
+                    </div>
+                }
+
+                <div class="flex flex-col md:flex-row gap-3">
+                    <p-button type="button" label="Cancel" severity="secondary" (onClick)="onCancel()"></p-button>
+                    <p-button type="submit"  [loading]="isLoading()" label="Create Tournament"></p-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card w-full md:w-1/3 flex flex-col items-center justify-start text-center p-6">
+            <svg width="128px" height="128px" viewBox="0 0 1024 1024" class="icon mb-4" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M828.5 180.1h-9.9v-54.7h23.5v-44H182v44h23v54.7h-9.5C123.2 180.1 64 239.2 64 311.5v0.1c0 72.3 59.2 131.5 131.5 131.5h9.6c0 1.3 0.1 2.5 0.1 3.7 0.5 17.7 2.7 35.4 6.2 52.5 17.8 85.7 71.8 160 148.3 204 4.8 2.8 9.8 5.4 14.7 7.9 15.3 7.7 31.2 14.1 47.4 19.2 3.4 1 6.8 2 10.2 2.9v165.2H250.4v44h511.9v-44H591.9V733.4c3.7-1 7.3-2.1 10.9-3.2 16.2-5.1 32.2-11.6 47.4-19.4 5-2.5 10-5.3 14.8-8.1 75.6-43.9 129.2-117.8 147-202.7 3.6-17.2 5.8-34.9 6.3-52.4 0.1-1.5 0.1-3 0.1-4.5h10c72.3 0 131.5-59.2 131.5-131.5v-0.1c0.1-72.3-59.1-131.4-131.4-131.4zM205 399.2h-9.5c-23.2 0-45.1-9.1-61.7-25.7s-25.7-38.5-25.7-61.7v-0.1c0-23.2 9.1-45.2 25.7-61.7 16.6-16.6 38.5-25.7 61.7-25.7h9.5v174.9z m370.9 499.4h-128V737.3c20.9 4.5 42.3 6.8 63.9 6.8 21.7 0 43.1-2.3 64.1-6.8v161.3z m198.7-461.4c0 2.9 0 5.9-0.2 8.9-0.5 15-2.3 30.1-5.4 44.9-15.3 72.7-61.2 136-126.1 173.7-4.1 2.4-8.4 4.7-12.7 6.9-13 6.6-26.7 12.2-40.6 16.6-25.2 7.9-51.4 11.9-77.9 11.9-26.2 0-52.2-3.9-77.1-11.6-13.9-4.3-27.5-9.8-40.6-16.4-4.2-2.1-8.5-4.4-12.6-6.8-65.4-37.8-111.7-101.5-126.9-174.8-3.1-14.7-4.9-29.8-5.3-45-0.1-2.7-0.1-5.5-0.1-8.2v-312h525.6v311.9zM916 311.7c0 23.2-9.1 45.2-25.7 61.7-16.6 16.6-38.5 25.7-61.7 25.7h-9.9v-175h9.9c23.2 0 45.1 9.1 61.7 25.7s25.7 38.5 25.7 61.7v0.2z"
+                    fill="#39393A"
+                />
+                <path
+                    d="M317.428 274.917l70.145-70.144 14.142 14.142-70.145 70.144zM316.055 351.98L456.13 211.904l14.142 14.142-140.076 140.076zM555.4 659.6l-4.8-19.4c0.3-0.1 26.5-6.8 55.4-23.5 37.8-21.9 62-49.7 72-82.7l19.1 5.8c-11.4 37.6-39.6 70.3-81.6 94.5-31.2 18-58.9 25-60.1 25.3z"
+                    fill="#E73B37"
+                />
+            </svg>
+            <h1 class="text-2xl font-bold mb-1">{{ formValues().tournamentName || '' }}</h1>
+            <h2 class="text-sm opacity-70">{{ formValues().tournamentDescription || '' }}</h2>
+        </div>
+    </div>
+</form>
