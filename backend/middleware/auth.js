@@ -30,7 +30,14 @@ const authenticate = (req, res, next) => {
 
 const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      console.log('No role found')
+      return next(
+          new HttpError("Authentication required. Missing user role.", 401)
+      );
+    }
     if (!allowedRoles.includes(req.user.role)) {
+      console.log(req.user.role)
       return next(
         new HttpError("You are not authorized to perform this action", 403),
       );

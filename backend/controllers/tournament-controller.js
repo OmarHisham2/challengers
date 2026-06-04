@@ -39,7 +39,7 @@ const getTournamentById = async (req, res, next) => {
 const getTournamentPlayers = (req, res, next) => {};
 const getTournamentMatches = (req, res, next) => {};
 const createTournament = async (req, res, next) => {
-    const {name, location, format, max_players, start_date, end_date, registration_deadline, description} = req.body
+    const {name, location, format, max_players, start_date, end_date, registration_deadline, description,best_of} = req.body
 
     if (!name || !location || !format || !max_players || !start_date || !end_date || !registration_deadline) {
         return next(new HttpError("Please fill the required fields.", 400));
@@ -70,7 +70,8 @@ const createTournament = async (req, res, next) => {
             name, location, format, max_players, registration_deadline: regDeadline, start_date: start, end_date: end,
             description: description || "",
             status: "draft",
-            created_by: '65f1a2b3c4d5e6f7a8b9c0d1'
+            created_by: '65f1a2b3c4d5e6f7a8b9c0d1',
+            best_of
         })
     }
     catch (err)
@@ -202,7 +203,7 @@ const registerPlayerToTournament = async (req, res, next) => {
         player = await Player.findById(playerId).session(session).exec()
         if (!player) {
             await session.abortTransaction()
-            return next(new HttpError("Could not find a player with this ID.", 404));
+            return next(new HttpError("Could not find a player-info with this ID.", 404));
         }
 
 
@@ -250,7 +251,7 @@ const removePlayerFromTournament = async (req, res, next) => {
         player = await Player.findById(playerId).session(session).exec()
         if (!player) {
             await session.abortTransaction()
-            return next(new HttpError("Could not find a player with this ID.", 404));
+            return next(new HttpError("Could not find a player-info with this ID.", 404));
         }
 
         if (!tournament.players.includes(player._id))

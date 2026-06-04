@@ -2,6 +2,7 @@ const HttpError = require("../models/http-error");
 const User = require("../models/user");
 const Player = require("../models/player");
 const Judge = require("../models/judge");
+const Admin = require("../models/admin");
 const bcrypt = require("bcrypt");
 
 const jwt = require("jsonwebtoken");
@@ -11,7 +12,7 @@ const getAllUsers = async (req, res, next) => {
   try {
     users = await User.find({}, "-password");
   } catch (e) {
-    const error = new HttpError("Couldn not Fetch Users!", 500);
+    const error = new HttpError("Could not Fetch Users!", 500);
     return next(error);
   }
   res.json(users.map((user) => user.toObject({ getters: true })));
@@ -32,14 +33,14 @@ const getUserById = async (req, res, next) => {
   res.json(user);
 };
 const signUp = async (req, res, next) => {
-  const { name, email, password, phone, role } = req.body;
+  const { name, email, password, phone, role,nationality } = req.body;
 
   try {
     if (!name || !email || !password || !phone || !role) {
       const error = new HttpError("All fields are required!", 400);
       return next(error);
     }
-    if (!["player", "judge"].includes(role)) {
+    if (!["player", "judge","admin"].includes(role)) {
       const error = new HttpError("Invalid role", 400);
       return next(error);
     }
@@ -60,10 +61,14 @@ const signUp = async (req, res, next) => {
       role,
     });
 
-    if (role == "player") {
-      await Player.create({ _id: newUser._id });
-    } else if (role == "judge") {
-      await Judge.create({ _id: newUser._id });
+    if (role === "player") {
+      await Player.create({ _id: newUser._id,name,nationality,status:"active"});
+    } else if (role === "judge") {
+      await Judge.create({ _id: newUser._id,name });
+    }
+    else if (role === "admin")
+    {
+      await Admin.create({_id:newUser._id,name})
     }
 
     res.status(201).json({ newUser });
@@ -73,6 +78,8 @@ const signUp = async (req, res, next) => {
   }
 };
 const signIn = async (req, res, next) => {
+
+
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -121,8 +128,8 @@ const signIn = async (req, res, next) => {
   } catch (e) {
     return next(
       new HttpError(
-        "Could not sign in, please try again -- Dev: Token Registation Failed",
-        500,
+        "Could not sign in, please try again",
+        401,
       ),
     );
   }

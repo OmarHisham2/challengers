@@ -1,0 +1,112 @@
+<div class="card">
+    <p-dataview [value]="tournaments()" [layout]="layout">
+        <ng-template #header>
+            <div class="flex justify-end">
+                <p-select-button [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
+                    <ng-template #tournament let-option>
+                        <i class="pi " [ngClass]="{ 'pi-bars': option === 'list', 'pi-table': option === 'grid' }"></i>
+                    </ng-template>
+                </p-select-button>
+            </div>
+        </ng-template>
+
+        <ng-template #list let-items>
+            <div class="flex flex-col">
+                @for (tournament of items; track tournament._id)
+                {
+                    <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4" ngClass="border-t border-surface">
+                        <div class="md:w-40 relative">
+                            <img class="block xl:block mx-auto rounded w-full" src="https://primefaces.org/cdn/primevue/images/product/{{ tournament.name }}" [alt]="tournament.name" />
+                            <div class="absolute bg-black/70 rounded-border" [style]="{ left: '4px', top: '4px' }">
+                                <p-tag [value]="tournament.status" [severity]="getStatus(tournament)"></p-tag>
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                            <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                <div>
+                                    <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{ tournament.start_date | date }} - {{tournament.end_date | date}}</span>
+                                    <div class="text-lg font-medium mt-2">{{ tournament.name }}</div>
+                                </div>
+                                <div class="bg-surface-100 p-1" style="border-radius: 30px">
+                                    <div
+                                        class="bg-surface-0 flex items-center gap-2 justify-center py-1 px-2"
+                                        style="
+                                                    border-radius: 30px;
+                                                    box-shadow:
+                                                        0px 1px 2px 0px rgba(0, 0, 0, 0.04),
+                                                        0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+                                                "
+                                    >
+                                        <span class="text-surface-900 font-medium text-sm">{{ tournament.location }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:items-end gap-8">
+                                <span class="text-xl font-semibold">{{tournament.players.length}} / {{ tournament.max_players }} Players</span>
+                                <div class="flex flex-row-reverse md:flex-row gap-2">
+                                    <p-button icon="pi pi-pencil"  styleClass="h-full" [outlined]="true"></p-button>
+                                    <p-button icon="pi pi-chevron-right" (click)="onTournamentClick(tournament.id)" iconPos="right" label="Manage Tournament" [disabled]="tournament.status === 'OUTOFSTOCK'" styleClass="flex-auto md:flex-initial whitespace-nowrap"></p-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                </div>
+        </ng-template>
+
+        <ng-template #grid let-items>
+            <div class="grid grid-cols-12 gap-4">
+                @for (tournament of items; track tournament._id)
+                {
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-4 p-2">
+                        <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
+                            <div class="relative w-full shadow-sm">
+                                <img class="rounded w-full" src="https://primefaces.org/cdn/primevue/images/product/{{ tournament.name }}" [alt]="tournament.name" />
+                                <div
+                                    class="absolute bg-black/70 rounded-border"
+                                    [style]="{
+                                            left: '4px',
+                                            top: '4px'
+                                        }"
+                                >
+                                    <p-tag [value]="tournament.status" [severity]="getStatus(tournament)"></p-tag>
+                                </div>
+                            </div>
+                            <div class="pt-12">
+                                <div class="flex flex-row justify-between items-start gap-2">
+                                    <div>
+                                        <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{tournament.start_date | date}} - {{tournament.end_date | date}}</span>
+                                        <div class="text-lg font-medium mt-1">
+                                            {{ tournament.name }}
+                                        </div>
+                                    </div>
+                                    <div class="bg-surface-100 p-1" style="border-radius: 30px">
+                                        <div
+                                            class="bg-surface-0 flex items-center gap-2 justify-center py-1 px-2"
+                                            style="
+                                                    border-radius: 30px;
+                                                    box-shadow:
+                                                        0px 1px 2px 0px rgba(0, 0, 0, 0.04),
+                                                        0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+                                                "
+                                        >
+                                            <span class="text-surface-900 font-medium text-xs">{{ tournament.location }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-6 mt-6">
+                                    <span class="text-2xl font-semibold">{{tournament.players.length}} / {{ tournament.max_players }} Players</span>
+                                    <div class="flex gap-2">
+                                        <p-button icon="pi pi-pencil"   styleClass="h-full" [outlined]="true"></p-button>
+                                        <p-button icon="pi pi-angle-right" (click)="onTournamentClick(tournament.id)" iconPos="right" label="Manage Tournament" class="flex-auto whitespace-nowrap" styleClass="w-full"></p-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </ng-template>
+    </p-dataview>
+</div>

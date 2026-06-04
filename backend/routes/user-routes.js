@@ -5,7 +5,7 @@ const { authenticate, authorizeRoles } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.get("/", userController.getUsers);
+router.get("/",authenticate, userController.getUsers);
 
 router.post("/signup", userController.signUp);
 router.post("/signin", userController.signIn);
