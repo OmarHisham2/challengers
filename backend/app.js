@@ -8,16 +8,14 @@ const bodyParser = require("body-parser");
 
 const mongoose = require("mongoose");
 
-// const matchRoute = require("./routes/match-routes");
+const matchRoute = require("./routes/match-routes");
 const userRoute = require("./routes/user-routes");
 const tournamentRoute = require("./routes/tournament-routes");
 const playerRoute = require("./routes/player-routes");
-const HttpError = require("./models/http-error");
 
 const app = express();
 
-const uri =
-  "mongodb://manu:1KKZyzq7YO0bZDtr@ac-dltubvs-shard-00-00.mnyyadk.mongodb.net:27017,ac-dltubvs-shard-00-01.mnyyadk.mongodb.net:27017,ac-dltubvs-shard-00-02.mnyyadk.mongodb.net:27017/?ssl=true&replicaSet=atlas-glylx8-shard-0&authSource=admin&appName=Cluster0";
+const uri = process.env.DB_PATH
 
 app.use(bodyParser.json());
 
@@ -31,8 +29,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use("/api/matches", matchRoute);
 app.use("/api/users", userRoute);
+app.use("/api/matches", matchRoute);
 app.use("/api/tournaments", tournamentRoute);
 app.use("/api/players", playerRoute);
 
