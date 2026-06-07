@@ -1,38 +1,32 @@
 import { Component, computed, inject, input, signal,  } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PlayerService } from '@/services/player.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { finalize, switchMap } from 'rxjs';
 import { Breadcrumb } from 'primeng/breadcrumb';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { Player } from '@/models/player.model';
-import { ButtonDirective } from 'primeng/button';
-import { CurrencyPipe } from '@angular/common';
+import { Button, ButtonDirective } from 'primeng/button';
 import { Ripple } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { Match } from '@/models/match.model';
 import { MatchService } from '@/services/match.service';
+import { Tag } from 'primeng/tag';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
     selector: 'app-player-info',
-    imports: [FormsModule, Breadcrumb, IconFieldModule, InputIconModule, ButtonDirective, Ripple, TableModule],
+    imports: [FormsModule, Breadcrumb, IconFieldModule, InputIconModule, ButtonDirective, Ripple, TableModule, Tag, Button, NgOptimizedImage],
     templateUrl: './player-info.html',
     providers: [MatchService]
 })
 export class PlayerInfo {
-    playerId = input.required<string>();
-
-    private playerService = inject(PlayerService);
+    player = input.required<Player>();
     matchService = inject(MatchService);
 
-    playerData = toSignal(toObservable(this.playerId).pipe(switchMap((id) => this.playerService.getPlayerById(id))), {
-        initialValue: {} as Player
-    });
-
     playerMatches = toSignal(
-        toObservable(this.playerId).pipe(
-            switchMap((id) => this.matchService.getMatchesByPlayerId(id)),
+        toObservable(this.player).pipe(
+            switchMap((player) => this.matchService.getMatchesByPlayerId(player._id)),
             finalize(() => {
                 console.log('matches fetched.');
             })
@@ -40,10 +34,22 @@ export class PlayerInfo {
         { initialValue: [] as Match[] }
     );
 
-    matches = signal<Match[]>([]);
-
-    breadcrumbItems = computed(() => {
-        const player = this.playerData();
-        return [{ label: 'Players', routerLink: '../' }, { label: player ? player.name : 'Loading...' }];
-    });
+    getStatusColor(status: string) {
+        console.log(this.player)
+        switch (status.toLowerCase()) {
+            case 'active':
+                return 'success';
+            case 'suspended':
+                return 'danger';
+            case 'inactive':
+                return 'warn';
+            default:
+                return 'info';
+        }
+    }
+    calculateWinRate(wins: number, losses: number): number {
+        const total = wins + losses;
+        if (total === 0) return 0;
+        return Math.round((wins / total) * 100);
+    }
 }

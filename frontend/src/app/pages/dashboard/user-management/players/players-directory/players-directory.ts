@@ -46,7 +46,8 @@ export class PlayersDirectory {
 
     // idk what these are --
 
-    onPlayerClick(playerId: string) {
-        this.router.navigate(['dashboard/players/', playerId]);
+    onPlayerClick(player: Player) {
+        console.log(player)
+        this.router.navigate(['dashboard/players/', player._id],{ state: { player:player }});
     }
 }
